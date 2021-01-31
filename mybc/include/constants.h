@@ -1,0 +1,2 @@
+#define MAXIDLEN 32
+#define MAXTBSIZE 0x10000
