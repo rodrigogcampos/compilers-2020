@@ -96,6 +96,7 @@
 #include <parser.h>
 
 extern char lexeme[];
+int error = 0;
 double E(void);
 double T(void);
 double F(void);
@@ -114,8 +115,13 @@ void cmd(void) {
 		exit(0);
 
 	default:
-		/**/ E_val = /**/E();
-		/**/ printf("%lg\n", E_val);/**/
+
+			/**/ E_val = /**/E();
+		if (error == 0) {
+			/**/ printf("%lg\n", E_val);/**/
+		}
+		// printf("error: %d\n", error);
+		error = 0;
 	}
 }
 
@@ -175,7 +181,12 @@ double T(void)
 		if (otimes == '*') {
 			T_val *= F_val;
 		} else {
-			T_val /= F_val;
+			if (F_val == 0) {
+				fprintf(stderr, "Math error: Division by zero not allowed\n");
+				error = -1;
+			} else {
+				T_val /= F_val;
+			}
 		}
 		/**/
 	}
@@ -240,7 +251,14 @@ double F(void)
 			/**/F_val = atof(lexeme);/**/
 			match(lookahead);
 			break;
-
+		case OCT:
+			/**/ F_val = strtol(lexeme, NULL, 8); /**/
+			match(lookahead);
+			break;
+		case HEX:
+			/**/ F_val = strtol(lexeme, NULL, 16); /**/
+			match(lookahead);
+			break;
 		default:
 		  /**/strcpy(name, lexeme);/**/
 			match(ID);
@@ -256,6 +274,7 @@ double F(void)
 	}
 	/**/ return F_val; /**/
 }
+
 void match(int expected)
 {
 	if (lookahead == expected)
@@ -265,7 +284,8 @@ void match(int expected)
 	else
 	{
 		fprintf(stderr, "token mismatch: expected %d whereas found %d\n",
-						expected, lookahead);
-		exit(-2);
+			expected, lookahead);
+			error = -1;
+		// exit(-2);
 	}
 }

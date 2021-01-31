@@ -70,8 +70,6 @@ int isUINT(FILE *tape)
 	int i = 0;
 
 	if (isdigit(lexeme[i] = getc(tape))) {
-		i++;
-
 		if (lexeme[i] == '0') {
 			i++;
 			lexeme[i] = 0;
@@ -185,11 +183,13 @@ int isOCT(FILE *tape) {
 
 	if ((lexeme[i] = getc(tape)) == '0') {
 		i++;
-		if(isdigit(lexeme[i] = getc(tape)) && lexeme[i] <= 7) {
+		if(isdigit(lexeme[i] = getc(tape)) && lexeme[i] <= '7') {
+
 			i++;
-			while (isdigit(lexeme[i] = getc(tape)) && lexeme[i] <= 7) {
+			while (isdigit(lexeme[i] = getc(tape)) && lexeme[i] <= '7') {
 				i++;
 			}
+
 			ungetc(lexeme[i], tape);
 			lexeme[i] = 0;
 			return OCT;
@@ -201,6 +201,7 @@ int isOCT(FILE *tape) {
 			return 0;
 		}
 	}
+
 	ungetc(lexeme[i], tape);
 	lexeme[i] = 0;
 	return 0;
@@ -249,9 +250,6 @@ int gettoken(FILE *source)
 
 	skipspaces(source);
 
-	if ((token = isID(source)))
-		return token;
-
 	if ((token = isOCT(source)))
 		return token;
 
@@ -259,6 +257,9 @@ int gettoken(FILE *source)
 		return token;
 
 	if ((token = isNUM(source)))
+		return token;
+
+	if ((token = isID(source)))
 		return token;
 
 	token = getc(source);
